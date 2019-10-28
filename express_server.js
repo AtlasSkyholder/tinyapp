@@ -2,10 +2,23 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 
+const bodyParser = require("body-parser");
+app.use(bodyParser.urlencoded({extended: true}));
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+function generateRandomString() {
+  let shortUrl = "";
+  let string = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  for (let i = 0; i < 6; i++){
+    let place = string.charAt(Math.floor(Math.random() * (string.length - 1)));
+    shortUrl += place;
+  }
+  return shortUrl;
+}
 
 app.set("view engine", "ejs");
 
@@ -20,6 +33,12 @@ app.get("/urls", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
+});
+
+app.post("/urls", (req,res) => {
+  console.log(req.body);
+  res.send("Ok");
+  console.log(generateRandomString());
 });
 
 app.get("/urls/:shortURL", (req, res) => {
