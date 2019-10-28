@@ -35,23 +35,26 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-app.post("/urls", (req,res) => {
-  console.log(req.body);
-  res.send("Ok");
-  console.log(generateRandomString());
-});
-
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL]};
   res.render("urls_show", templateVars);
 });
 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
+app.post("/urls", (req,res) => {
+  console.log(req.body);
+  urlDatabase[generateRandomString()] = req.body['longURL'];
+  res.redirect("/urls");
 });
 
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
+app.get("/u/:shortURL", (req, res) => {
+  // const longURL = ...s
+  const longUrl = req.params.shortURL;
+
+  res.redirect(urlDatabase[longUrl]);
+});
+
+app.get("/urls.json", (req, res) => {
+  res.json(urlDatabase);
 });
 
 app.listen(PORT, () => {
