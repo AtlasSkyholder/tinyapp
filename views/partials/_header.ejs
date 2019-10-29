@@ -8,6 +8,22 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+
+        <% if(username){ %>
+          <form method="POST" action="/logout">
+            <div class="input-group mb-3">
+              <h3>Logged in as: <%= username %></h3>
+              <button type="submit" class="btn btn-primary">Logout</button>
+            </div>
+          </form>
+        <% } else { %>  
+          <form method="POST" action="/login">
+            <div class="input-group mb-3" style="text-align:right">
+                <input type="text" class="form-control" name="username" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
+                <button type="submit" class="btn btn-primary">Login</button>
+              </div>
+          </form>
+       <% } %>
       </div>
     </div>
   </nav>
