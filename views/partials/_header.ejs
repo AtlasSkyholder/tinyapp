@@ -8,22 +8,29 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-
-        <% if(username){ %>
-          <form method="POST" action="/logout">
-            <div class="input-group mb-3">
-              <h3>Logged in as: <%= username %></h3>
-              <button type="submit" class="btn btn-primary">Logout</button>
-            </div>
-          </form>
-        <% } else { %>  
-          <form method="POST" action="/login">
-            <div class="input-group mb-3" style="text-align:right">
-                <input type="text" class="form-control" name="username" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
+      </div>
+      <div style="margin-right:0;">
+          <% if(user_id){ %>
+            <form method="POST" action="/logout">
+              <div class="input-group mb-3">
+                <a class="form-inline">Logged in as: <%= user_id %></a>
+                <button type="submit" class="btn btn-primary">Logout</button>
+              </div>
+            </form>
+          <% } else { %>
+            <div class="navbar-nav">
+            <form method="GET" action="/login">
+              <div class="input-group mb-3">
                 <button type="submit" class="btn btn-primary">Login</button>
               </div>
-          </form>
-       <% } %>
+            </form>
+            <form method="GET" action="/register">
+              <div class="input-group mb-3">
+                <button type="submit" class="btn btn-primary">Register</button>
+              </div>
+            </form>
+          </div>
+         <% } %>
       </div>
     </div>
   </nav>
