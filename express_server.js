@@ -109,8 +109,8 @@ app.post("/urls/:id", (req, res) => {  // edit
   if (newArr.length === 0) {   // if arr is empty, then the user is not logged in or has nothing stored in
     res.redirect("/login");  //redirect to log in
   } else {
-    let obj = urlDatabase[req.params.id];   // updates the database with new longURL
-    urlDatabase[req.params.id] = {longURL: obj['longURL'], userID: req.session.user_id};
+    let obj = req.body['longURL'];   // updates the database with new longURL
+    urlDatabase[req.params.id] = {longURL: obj, userID: req.session.user_id};
     res.redirect("/urls");
   }
 });
