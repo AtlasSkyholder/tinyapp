@@ -7,7 +7,11 @@
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
-        <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+        <% if (user_id) { %>
+          <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+        <% } else { %>
+          <a class="nav-item nav-link" href="/login">Create New URL</a>
+        <% } %>
       </div>
       <div style="margin-right:0;">
           <% if(user_id){ %>
