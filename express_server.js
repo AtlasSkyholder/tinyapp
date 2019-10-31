@@ -6,11 +6,16 @@ const cookieSession = require('cookie-session');
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
 const helpers = require("./helpers.js");
+
 const getUserByEmail = helpers.getUserByEmail;
+const generateRandomString = helpers.generateRandomString;
+const urlsForUser = helpers.urlsForUser;
+const checkPass = helpers.checkPass;
+
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
-  maxAge: 24*60*60*1000,
+  maxAge: 24 * 60 * 60 * 1000,
   keys: ['mangaisgreat']
 }));
 
@@ -19,58 +24,17 @@ const urlDatabase = {
   "9sm5xK": { longURL: "http://www.google.com", userID: "aJ48lW"}
 };
 
-const users = { 
+const users = {
   "userRandomID": {
-    id: "userRandomID", 
-    email: "user@example.com", 
+    id: "userRandomID",
+    email: "user@example.com",
     password: "purple-monkey-dinosaur"
   },
- "user2RandomID": {
-    id: "user2RandomID", 
-    email: "user2@example.com", 
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
     password: "dishwasher-funk"
   }
-}
-
-function generateRandomString() {
-  let shortUrl = '';
-  let string = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  for (let i = 0; i < 6; i++){
-    let place = string.charAt(Math.floor(Math.random() * (string.length - 1)));
-    shortUrl += place;
-  }
-  return shortUrl;
-};
-
-const checkEmail = function(str, users){  
-  for (let userId in users) {
-    let obj = users[userId];
-    if (obj['email'] === str) {
-      return str;
-    }
-  }
-  return "";
-};
-
-const checkPass = function(str, pass, users){
-  for (let userId in users) {
-    let obj = users[userId];
-    if (obj['email'] === str && bcrypt.compareSync(pass, obj['password'])) {
-      return true;
-    }
-  }
-  return false;
-};
-
-const urlsForUser = function(id, urlData){  // checks if userID matches inside urlDatabase and returns
-  let arr = [];                             // array of short urls
-  for (let item in urlData) {
-    let obj = urlData[item];
-    if (obj['userID'] == id) {
-      arr.push(item);
-    }
-  }
-  return arr;
 };
 
 let templateVars = {};
@@ -123,7 +87,7 @@ app.get("/u/:shortURL", (req, res) => {  // sends us to the longURL
 });
 
 app.post("/urls/:shortURL/edit", (req, res) => {  // edit -> to render urls_show
-  let obj = urlDatabase[req.params.shortURL]; 
+  let obj = urlDatabase[req.params.shortURL];
   templateVars = { shortURL: req.params.shortURL, longURL: obj['longURL'], user_id: req.session.user_id};
   res.render("urls_show", templateVars);
 });
@@ -156,6 +120,7 @@ app.post("/login", (req, res) => {
   let pass = req.body['password'];
   let compareE = getUserByEmail(email, users);  //gets id from users
   let obj = users[compareE];
+  let userId;
   if (obj['email'] === email && checkPass(email, pass, users)) {
     userId = email;
   } else {
@@ -179,7 +144,7 @@ app.post("/register", (req, res) => {
   const password = req.body['password']; // found in the req.params object
   const hashedPassword = bcrypt.hashSync(password, 10);
   idObj['password'] = hashedPassword;
-  if (req.body['email'] === "" || req.body['password'] === ""){   // checks if email or pass is empty
+  if (req.body['email'] === "" || req.body['password'] === "") {   // checks if email or pass is empty
     res.sendStatus(404);
     return;
   }
@@ -188,7 +153,7 @@ app.post("/register", (req, res) => {
   console.log(compareE);
   if (obj === undefined) {  // checks if emails already exist
     users[user] = idObj;
-  } else if (obj['email'] === req.body['email']){
+  } else if (obj['email'] === req.body['email']) {
     res.sendStatus(404);
     return;
   }

@@ -13,29 +13,30 @@
           <a class="nav-item nav-link" href="/login">Create New URL</a>
         <% } %>
       </div>
-      <div style="margin-right:0;">
-          <% if(user_id){ %>
-            <form method="POST" action="/logout">
-              <div class="input-group mb-3">
-                <a class="form-inline">Logged in as: <%= user_id %></a>
-                <button type="submit" class="btn btn-primary">Logout</button>
-              </div>
-            </form>
-          <% } else { %>
-            <div class="navbar-nav">
-            <form method="GET" action="/login">
-              <div class="input-group mb-3">
-                <button type="submit" class="btn btn-primary">Login</button>
-              </div>
-            </form>
-            <form method="GET" action="/register">
-              <div class="input-group mb-3">
-                <button type="submit" class="btn btn-primary">Register</button>
-              </div>
-            </form>
-          </div>
-         <% } %>
-      </div>
+
     </div>
+    <div align = "right">
+      <% if(user_id){ %>
+        <form method="POST" action="/logout">
+          <div class="input-group mb-3">
+            <a class="form-inline">Logged in as: <%= user_id %></a>
+            <button type="submit" class="btn btn-primary">Logout</button>
+          </div>
+        </form>
+      <% } else { %>
+        <div class="navbar-nav">
+        <form method="GET" action="/login">
+          <div class="input-group mb-3">
+            <button type="submit" class="btn btn-primary">Login</button>
+          </div>
+        </form>
+        <form method="GET" action="/register">
+          <div class="input-group mb-3">
+            <button type="submit" class="btn btn-primary">Register</button>
+          </div>
+        </form>
+      </div>
+     <% } %>
+  </div>
   </nav>
 </header>
