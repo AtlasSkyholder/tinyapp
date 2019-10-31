@@ -4,6 +4,8 @@ const PORT = 8080; // default port 8080
 const cookieParser = require('cookie-parser');
 
 const bodyParser = require("body-parser");
+const bcrypt = require('bcrypt');
+
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
@@ -48,21 +50,17 @@ const checkEmail = function(str, users){
 const checkPass = function(str, pass, users){
   for (let userId in users) {
     let obj = users[userId];
-    if (obj['email'] === str && obj['password'] === pass) {
-      return pass;
+    if (obj['email'] === str && bcrypt.compareSync(pass, obj['password'])) {
+      return true;
     }
   }
-  return "";
+  return false;
 };
 
 const urlsForUser = function(id, urlData){  // checks if userID matches inside urlDatabase and returns
   let arr = [];                             // array of short urls
   for (let item in urlData) {
     let obj = urlData[item];
-    console.log(typeof id); // checking type
-    console.log(typeof obj['userID']);  //checking type
-    console.log(id);
-    console.log(obj['userID']);
     if (obj['userID'] == id) {
       arr.push(item);
     }
@@ -151,7 +149,7 @@ app.post("/urls/:id", (req, res) => {  // edit
 app.post("/login", (req, res) => {
   let email = req.body['email'];
   let pass = req.body['password'];
-  if (checkEmail(email, users) === email && checkPass(email, pass, users) === pass) {
+  if (checkEmail(email, users) === email && checkPass(email, pass, users)) {
     userId = email;
   } else {
     res.sendStatus(404);
@@ -171,7 +169,9 @@ app.post("/register", (req, res) => {
   let user = generateRandomString();  
   idObj['id'] = user;
   idObj['email'] = req.body['email'];
-  idObj['password'] = req.body['password'];
+  const password = req.body['password']; // found in the req.params object
+  const hashedPassword = bcrypt.hashSync(password, 10);
+  idObj['password'] = hashedPassword;
   if (req.body['email'] === "" || req.body['password'] === ""){
     res.sendStatus(404);
     return;
