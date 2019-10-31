@@ -5,6 +5,8 @@ const cookieSession = require('cookie-session');
 
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
+const helpers = require("./helpers.js");
+const getUserByEmail = helpers.getUserByEmail;
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
@@ -40,7 +42,7 @@ function generateRandomString() {
   return shortUrl;
 };
 
-const checkEmail = function(str, users){
+const checkEmail = function(str, users){  
   for (let userId in users) {
     let obj = users[userId];
     if (obj['email'] === str) {
@@ -152,7 +154,9 @@ app.post("/urls/:id", (req, res) => {  // edit
 app.post("/login", (req, res) => {
   let email = req.body['email'];
   let pass = req.body['password'];
-  if (checkEmail(email, users) === email && checkPass(email, pass, users)) {
+  let compareE = getUserByEmail(email, users);  //gets id from users
+  let obj = users[compareE];
+  if (obj['email'] === email && checkPass(email, pass, users)) {
     userId = email;
   } else {
     res.sendStatus(404);
@@ -169,26 +173,26 @@ app.post("/logout", (req,res) => {
 
 app.post("/register", (req, res) => {
   let idObj = {};
-  let user = generateRandomString();  
+  let user = generateRandomString();  // generates a new userId
   idObj['id'] = user;
   idObj['email'] = req.body['email'];
   const password = req.body['password']; // found in the req.params object
   const hashedPassword = bcrypt.hashSync(password, 10);
   idObj['password'] = hashedPassword;
-  if (req.body['email'] === "" || req.body['password'] === ""){
+  if (req.body['email'] === "" || req.body['password'] === ""){   // checks if email or pass is empty
     res.sendStatus(404);
     return;
   }
-  if (checkEmail(req.body['email'], users) === req.body['email']) {
-    res.sendStatus(404);
-    return;
-  } else {
+  let compareE = getUserByEmail(req.body['email'], users); //gets id from users
+  let obj = users[compareE];
+  console.log(compareE);
+  if (obj === undefined) {  // checks if emails already exist
     users[user] = idObj;
+  } else if (obj['email'] === req.body['email']){
+    res.sendStatus(404);
+    return;
   }
-  if (checkEmail(req.session.user_id, users)) {
-    templateVars['user_id'] = req.session.user_id;
-  }
-  req.session.user_id =  idObj['email'];
+  req.session.user_id =  idObj['email'];  // when logging in through register, it creates a cookie
   res.redirect("/urls");
 });
 
