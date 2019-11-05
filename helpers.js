@@ -1,4 +1,3 @@
-const express = require('express');
 const bcrypt = require('bcrypt');
 
 const generateRandomString = function() {  // generates a randon string, I use this for both

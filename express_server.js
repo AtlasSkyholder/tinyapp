@@ -50,7 +50,12 @@ app.set("view engine", "ejs");
 //////////////////////////////////
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  console.log(JSON.stringify(req.session) );
+  if(JSON.stringify(req.session) === "{}") {
+    res.redirect("/login");
+  }  else  {
+    res.redirect("/urls");
+  }
 });
 
 //////////////////////////////////
@@ -215,7 +220,6 @@ app.post("/register", (req, res) => {
   }
   let compareE = getUserByEmail(req.body['email'], users); //gets id from users
   let obj = users[compareE];
-  console.log(compareE);
   if (obj === undefined) {  // checks if emails already exist
     users[user] = idObj;
   } else if (obj['email'] === req.body['email']) {
