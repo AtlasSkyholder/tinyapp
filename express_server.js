@@ -46,7 +46,6 @@ app.set("view engine", "ejs");
 //////////////////////////////////
 
 app.get("/", (req, res) => {
-  console.log(JSON.stringify(req.session) );
   if(JSON.stringify(req.session) === "{}") {
     res.redirect("/login");
   }  else  {
@@ -121,7 +120,7 @@ app.get("/u/:shortURL", (req, res) => {  // sends us to the longURL
   // const longURL = ...s
   const shortUrl = req.params.shortURL;
 
-  res.redirect(urlDatabase[shortUrl]);
+  res.redirect(urlDatabase[shortUrl].longURL);
 });
 
 //////////////////////
