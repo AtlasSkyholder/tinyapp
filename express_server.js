@@ -5,12 +5,8 @@ const cookieSession = require('cookie-session');
 
 const bodyParser = require("body-parser");
 const bcrypt = require('bcrypt');
-const helpers = require("./helpers.js");
 
-const getUserByEmail = helpers.getUserByEmail;
-const generateRandomString = helpers.generateRandomString;
-const urlsForUser = helpers.urlsForUser;
-const checkPass = helpers.checkPass;
+const { getUserByEmail, generateRandomString, urlsForUser, checkPass } = require("./helpers.js");
 
 
 app.use(bodyParser.urlencoded({extended: true}));
@@ -181,13 +177,11 @@ app.post("/login", (req, res) => {
   let userId;
   if (obj === undefined) {     // if email is wrong, send 404
     res.sendStatus(404);
-    return;
   }
   if (obj['email'] === email && checkPass(email, pass, users)) { // email is right and pass are right
     userId = email;             // login, if either is wrong then send 404
   } else {
     res.sendStatus(404);
-    return;
   }
   req.session.user_id = userId;
   res.redirect("/urls");
@@ -216,7 +210,6 @@ app.post("/register", (req, res) => {
   idObj['password'] = hashedPassword;
   if (req.body['email'] === "" || req.body['password'] === "") {   // checks if email or pass is empty
     res.sendStatus(404);
-    return;
   }
   let compareE = getUserByEmail(req.body['email'], users); //gets id from users
   let obj = users[compareE];
