@@ -67,8 +67,8 @@ app.get("/register", (req, res) => {
 //////////////////////////////////
 
 app.get("/urls", (req, res) => {
-  templateVars = { urls: urlDatabase, user_id: req.session.user_id };
-  res.render("urls_index", templateVars);
+    templateVars = { urls: urlDatabase, user_id: req.session.user_id };
+    res.render("urls_index", templateVars);
 });
 
 //////////////////////////////////
@@ -84,10 +84,14 @@ app.get("/urls/new", (req, res) => {
 //////////////////////////////////
 
 app.get("/urls/:shortURL", (req, res) => {
-  let obj = urlDatabase[req.params.shortURL];
-  urlDatabase[req.params.shortURL] = {longURL: obj['longURL'], userID: req.session.user_id};
-  templateVars = { urls: urlDatabase, shortURL: req.params.shortURL, longURL: obj['longURL'],  user_id: req.session.user_id};
-  res.render("urls_show", templateVars);
+  if (req.session.user_id) {
+    let obj = urlDatabase[req.params.shortURL];
+    urlDatabase[req.params.shortURL] = {longURL: obj['longURL'], userID: req.session.user_id};
+    templateVars = { urls: urlDatabase, shortURL: req.params.shortURL, longURL: obj['longURL'],  user_id: req.session.user_id};
+    res.render("urls_show", templateVars);
+  } else {
+    res.redirect("/login");
+  }
 });
 
 //////////////////////////////////
@@ -131,8 +135,8 @@ app.get("/u/:shortURL", (req, res) => {  // sends us to the longURL
 //////////////////////
 
 app.post("/urls/:shortURL/edit", (req, res) => {  // edit -> to render urls_show
-  let obj = urlDatabase[req.params.shortURL];
-  templateVars = { shortURL: req.params.shortURL, longURL: obj['longURL'], user_id: req.session.user_id};
+  let database = urlDatabase[req.params.shortURL];
+  templateVars = { shortURL: req.params.shortURL, longURL: database['longURL'], user_id: req.session.user_id};
   res.render("urls_show", templateVars);
 });
 
@@ -141,11 +145,11 @@ app.post("/urls/:shortURL/edit", (req, res) => {  // edit -> to render urls_show
 /////////////////////////////
 
 app.post("/urls/:shortURL/delete", (req, res) => {  // delete
-  let newArr = urlsForUser(req.session.user_id, urlDatabase);  //creates the arr
-  if (newArr.length === 0) {   // if arr is empty, then the user is not logged in or has nothing stored in
+  let arrayOfUrls = urlsForUser(req.session.user_id, urlDatabase);  //creates the arr
+  if (arrayOfUrls.length === 0) {   // if arr is empty, then the user is not logged in or has nothing stored in
     res.redirect("/login");  //redirect to log in
   } else {
-    if (newArr.indexOf(req.params.shortURL) > -1) {  // checks if the item to delete is inside the arr
+    if (arrayOfUrls.indexOf(req.params.shortURL) > -1) {  // checks if the item to delete is inside the arr
       delete urlDatabase[req.params.shortURL];  // deletes if its in
     }
     res.redirect("/urls");  // redirects back to main page
@@ -157,12 +161,12 @@ app.post("/urls/:shortURL/delete", (req, res) => {  // delete
 //////////////////////////////////////
 
 app.post("/urls/:id", (req, res) => {  // edit
-  let newArr = urlsForUser(req.session.user_id, urlDatabase);  //creates the arr
-  if (newArr.length === 0) {   // if arr is empty, then the user is not logged in or has nothing stored in
+  let arrayOfUrls = urlsForUser(req.session.user_id, urlDatabase); //creates the arr
+  if (arrayOfUrls.length === 0) {   // if arr is empty, then the user is not logged in or has nothing stored in
     res.redirect("/login");  //redirect to log in
   } else {
-    let obj = req.body['longURL'];   // updates the database with new longURL
-    urlDatabase[req.params.id] = {longURL: obj, userID: req.session.user_id};
+    let longUrl = req.body['longURL'];   // updates the database with new longURL
+    urlDatabase[req.params.id] = {longURL: longUrl, userID: req.session.user_id};
     res.redirect("/urls");
   }
 });
@@ -174,13 +178,13 @@ app.post("/urls/:id", (req, res) => {  // edit
 app.post("/login", (req, res) => {
   let email = req.body['email'];
   let pass = req.body['password'];
-  let compareE = getUserByEmail(email, users);  //gets id from users
-  let obj = users[compareE];
+  let comparedUser = getUserByEmail(email, users);  //gets id from users
+  let userObject = users[comparedUser];
   let userId;
-  if (obj === undefined) {     // if email is wrong, send 404
+  if (userObject === undefined) {     // if email is wrong, send 404
     res.sendStatus(404);
   }
-  if (obj['email'] === email && checkPass(email, pass, users)) { // email is right and pass are right
+  if (userObject['email'] === email && checkPass(email, pass, users)) { // email is right and pass are right
     userId = email;             // login, if either is wrong then send 404
   } else {
     res.sendStatus(404);
